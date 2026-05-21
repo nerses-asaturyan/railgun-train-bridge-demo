@@ -1,0 +1,10 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Belt-and-braces (skill folder also gitignores these):
+**/node_modules/
+**/state/
+*.log
