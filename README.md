@@ -48,10 +48,14 @@ npm run smoke
 Run the demo (default 0.0001 ETH; substitute any wei amount):
 
 ```powershell
-npm run demo -- --amount 100000000000000
+npm run pretty -- --amount 100000000000000
 ```
 
-The orchestrator emits structured JSON events on stdout — one event per stage. When it needs you to fund an address or confirm something, it exits cleanly (exit 0). Fund the named address, then re-run the **exact same command**; the state machine resumes where it stopped. State is persisted in `state/` between invocations.
+`npm run pretty` is the human-friendly wrapper — colored stages, boxed "ACTION REQUIRED" prompts when funding is needed, and the headline privacy moments highlighted. Use it for manual runs and video recordings.
+
+`npm run demo -- --amount …` is the raw orchestrator that emits machine-readable JSON events on stdout, one per stage. The agent path (via Claude Code) uses this. Don't break its output.
+
+Either way, when the orchestrator needs you to fund an address or confirm something, it exits cleanly (exit 0). Fund the named address, then re-run the **exact same command**; the state machine resumes where it stopped. State is persisted in `state/` between invocations.
 
 Reset (wipe wallets and start over):
 
@@ -102,13 +106,13 @@ npm run watch
 
 Two terminals side-by-side.
 
-| Terminal A (demo)                                                  | Terminal B (watch + rebalance)                                                |
-|--------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| `npm run demo -- --amount 100000000000000` → `state.initialized`   | `$env:FUNDING_PRIVATE_KEY = "0x..."`<br>`npm run watch` (running throughout)  |
-| (waiting for funds)                                                | (separate shell or Ctrl-C / restart in B) `npm run rebalance` → two txs       |
-|                                                                    | `npm run watch` — broadcaster + dest balances jump                            |
-| `npm run demo -- --amount 100000000000000` → shields, quotes, locks | Watch shows 0zk WETH appear, then Sepolia Train HTLC funded                   |
-| (5–10 min) → `done`                                                | Watch shows Arb Sepolia Train HTLC funded by solver, then dest balance jump   |
+| Terminal A (demo)                                                    | Terminal B (watch + rebalance)                                                |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `npm run pretty -- --amount 100000000000000` → `state.initialized`   | `$env:FUNDING_PRIVATE_KEY = "0x..."`<br>`npm run watch` (running throughout)  |
+| (waiting for funds — pretty prints a yellow ACTION REQUIRED box)     | (separate shell or Ctrl-C / restart in B) `npm run rebalance` → two txs       |
+|                                                                      | `npm run watch` — broadcaster + dest balances jump                            |
+| `npm run pretty -- --amount 100000000000000` → shields, quotes, locks | Watch shows 0zk WETH appear, then Sepolia Train HTLC funded                   |
+| (5–10 min) → magenta `★` source.locked, green BRIDGE COMPLETE box    | Watch shows Arb Sepolia Train HTLC funded by solver, then dest balance jump   |
 
 ## Architecture in one diagram
 
