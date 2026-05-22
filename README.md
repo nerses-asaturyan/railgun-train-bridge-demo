@@ -61,6 +61,55 @@ npm run reset
 
 For the full stage → narration table, list of gotchas, and troubleshooting symptoms-to-fixes, see [.claude/skills/railgun-train-bridge/SKILL.md](.claude/skills/railgun-train-bridge/SKILL.md).
 
+### Two-terminal video demo (helper scripts)
+
+For a live walkthrough or screen recording where you want a second terminal showing balances in real time, the skill ships two helper scripts. One key signs on both chains — set it once:
+
+```powershell
+$env:FUNDING_PRIVATE_KEY = "0x..."     # PowerShell
+```
+
+```bash
+export FUNDING_PRIVATE_KEY='0x...'     # bash/zsh
+```
+
+#### `npm run rebalance` — fund the demo wallets in one shot
+
+Sends ETH from your funding wallet to the broadcaster (Sepolia) and dest EOA (Arb Sepolia) in two confirmed transactions. Reads `state/wallets.json` for the recipient addresses, so run this **after** `npm run demo` has emitted `state.initialized`.
+
+```powershell
+npm run rebalance
+# defaults: 0.011 ETH -> Sepolia broadcaster, 0.001 ETH -> Arb Sepolia dest
+
+npm run rebalance -- --source-eth 0.02 --dest-eth 0.002
+# override either amount
+```
+
+#### `npm run watch` — live dashboard of all relevant balances
+
+Top-style refreshing dashboard. Polls every 5 seconds by default (override with `POLL_INTERVAL_MS`). Shows:
+
+- **Sepolia**: funder, broadcaster, **0zk shielded WETH**, Train HTLC contract
+- **Arb Sepolia**: funder, dest EOA, Train HTLC contract
+
+Funder rows render only when `FUNDING_PRIVATE_KEY` is set. The 0zk row reads via the Railgun engine, so the first tick takes ~30–60 s while the engine boots; subsequent ticks are fast.
+
+```powershell
+npm run watch
+```
+
+#### Typical recording flow
+
+Two terminals side-by-side.
+
+| Terminal A (demo)                                                  | Terminal B (watch + rebalance)                                                |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `npm run demo -- --amount 100000000000000` → `state.initialized`   | `$env:FUNDING_PRIVATE_KEY = "0x..."`<br>`npm run watch` (running throughout)  |
+| (waiting for funds)                                                | (separate shell or Ctrl-C / restart in B) `npm run rebalance` → two txs       |
+|                                                                    | `npm run watch` — broadcaster + dest balances jump                            |
+| `npm run demo -- --amount 100000000000000` → shields, quotes, locks | Watch shows 0zk WETH appear, then Sepolia Train HTLC funded                   |
+| (5–10 min) → `done`                                                | Watch shows Arb Sepolia Train HTLC funded by solver, then dest balance jump   |
+
 ## Architecture in one diagram
 
 ```

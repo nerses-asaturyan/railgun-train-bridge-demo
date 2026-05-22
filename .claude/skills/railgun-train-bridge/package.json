@@ -7,7 +7,9 @@
     "demo": "tsx src/index.ts",
     "reset": "tsx src/index.ts --reset",
     "check": "tsc --noEmit",
-    "smoke": "node smoke.mjs"
+    "smoke": "node smoke.mjs",
+    "rebalance": "node rebalance.mjs",
+    "watch": "tsx watch.ts"
   },
   "dependencies": {
     "@railgun-community/shared-models": "8.0.1",
