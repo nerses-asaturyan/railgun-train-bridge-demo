@@ -178,18 +178,13 @@ export async function checkSourceFunding(
 
 /**
  * Boot the Railgun engine, hydrate the wallet, refresh balances, and return the
- * current spendable WETH balance in the 0zk wallet on Sepolia. Used to decide
- * whether the broadcaster needs full shield-budget liquid ETH, or only enough
- * for the lock tx.
+ * current spendable WETH balance in the 0zk wallet on Sepolia. Spendable here
+ * means post-POI (Proof of Innocence): the new UTXO has been seen by the engine
+ * AND validated by the POI aggregator. Used by the orchestrator to decide
+ * whether the broadcaster needs full shield-budget liquid ETH or only lock gas.
  */
 export async function probeShieldedBalance(wallets: Wallets): Promise<bigint> {
-  await initRailgun();
-  await createRailgunWallet(
-    railgunEncryptionKey(wallets.railgunPassword),
-    wallets.railgunMnemonic,
-    { [SEPOLIA_RAILGUN_NETWORK]: wallets.railgunCreationBlock }
-  );
-  await refreshBalances(SEPOLIA_RAILGUN_CHAIN, [wallets.railgunWalletId]);
+  await hydrateRailgun(wallets);
   const railgunWallet = fullWalletForID(wallets.railgunWalletId);
   return balanceForERC20Token(
     TXID_VERSION,
@@ -198,6 +193,35 @@ export async function probeShieldedBalance(wallets: Wallets): Promise<bigint> {
     wethAddress(),
     true
   );
+}
+
+/**
+ * Same as probeShieldedBalance but returns the TOTAL balance — includes UTXOs
+ * the engine has scanned but POI hasn't yet validated. Used by the watch
+ * dashboard so a shield tx's effect appears as soon as the engine sees it,
+ * without waiting 30-60s for POI validation. Not safe to gate spend decisions
+ * on this value.
+ */
+export async function probeShieldedTotalBalance(wallets: Wallets): Promise<bigint> {
+  await hydrateRailgun(wallets);
+  const railgunWallet = fullWalletForID(wallets.railgunWalletId);
+  return balanceForERC20Token(
+    TXID_VERSION,
+    railgunWallet,
+    SEPOLIA_RAILGUN_NETWORK,
+    wethAddress(),
+    false
+  );
+}
+
+async function hydrateRailgun(wallets: Wallets): Promise<void> {
+  await initRailgun();
+  await createRailgunWallet(
+    railgunEncryptionKey(wallets.railgunPassword),
+    wallets.railgunMnemonic,
+    { [SEPOLIA_RAILGUN_NETWORK]: wallets.railgunCreationBlock }
+  );
+  await refreshBalances(SEPOLIA_RAILGUN_CHAIN, [wallets.railgunWalletId]);
 }
 
 export type DestFundingStatus =

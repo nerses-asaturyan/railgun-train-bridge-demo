@@ -20,7 +20,7 @@
 import { existsSync } from "node:fs";
 import { JsonRpcProvider, Wallet, formatEther } from "ethers";
 
-import { probeShieldedBalance } from "./src/bootstrap.js";
+import { probeShieldedTotalBalance } from "./src/bootstrap.js";
 import { ARB_SEPOLIA, SEPOLIA, TRAIN_SOLVER_API } from "./src/networks.js";
 import { WALLETS_PATH, loadWallets } from "./src/state.js";
 
@@ -63,7 +63,7 @@ async function tick(): Promise<void> {
         arbProvider.getBalance(dest),
         funder ? arbProvider.getBalance(funder) : Promise.resolve(0n),
         trainContracts.arb ? arbProvider.getBalance(trainContracts.arb) : Promise.resolve(0n),
-        probeShieldedBalance(wallets)
+        probeShieldedTotalBalance(wallets)
       ]);
 
     process.stdout.write("\x1b[2J\x1b[H");
