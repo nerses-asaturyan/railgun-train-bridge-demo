@@ -25,6 +25,8 @@ import { ARB_SEPOLIA, SEPOLIA, TRAIN_SOLVER_API } from "./src/networks.js";
 import { WALLETS_PATH, loadWallets } from "./src/state.js";
 
 const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS ?? 500);
+const LABEL_W = 20;
+const ID_W = 22;
 
 if (!existsSync(WALLETS_PATH)) {
   console.error(`ERROR: ${WALLETS_PATH} not found.`);
@@ -86,9 +88,6 @@ async function tick(): Promise<void> {
     console.error(`\n[poll error: ${(e as Error).message}]`);
   }
 }
-
-const LABEL_W = 20;
-const ID_W = 22;
 
 function row(label: string, addr: string, wei: bigint, unit: string): void {
   console.log(
