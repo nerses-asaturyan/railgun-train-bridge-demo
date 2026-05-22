@@ -91,7 +91,7 @@ npm run rebalance -- --source-eth 0.02 --dest-eth 0.002
 
 #### `npm run watch` — live dashboard of all relevant balances
 
-Top-style refreshing dashboard. Polls every 5 seconds by default (override with `POLL_INTERVAL_MS`). Shows:
+Top-style refreshing dashboard. Polls every 500 ms by default (override with `POLL_INTERVAL_MS`). Shows:
 
 - **Sepolia**: funder, broadcaster, **0zk shielded WETH**, Train HTLC contract
 - **Arb Sepolia**: funder, dest EOA, Train HTLC contract

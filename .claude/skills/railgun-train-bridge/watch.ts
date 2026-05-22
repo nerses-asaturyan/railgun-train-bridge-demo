@@ -14,7 +14,7 @@
  *
  * Optional env:
  *   FUNDING_PRIVATE_KEY=0x...   show funder rows
- *   POLL_INTERVAL_MS=3000       override poll cadence (default 5000)
+ *   POLL_INTERVAL_MS=1500       override poll cadence (default 500)
  */
 
 import { existsSync } from "node:fs";
@@ -24,7 +24,7 @@ import { probeShieldedBalance } from "./src/bootstrap.js";
 import { ARB_SEPOLIA, SEPOLIA, TRAIN_SOLVER_API } from "./src/networks.js";
 import { WALLETS_PATH, loadWallets } from "./src/state.js";
 
-const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS ?? 5000);
+const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS ?? 500);
 
 if (!existsSync(WALLETS_PATH)) {
   console.error(`ERROR: ${WALLETS_PATH} not found.`);
